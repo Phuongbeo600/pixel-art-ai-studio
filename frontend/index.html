@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel Art AI Studio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-icon">👾</span>
+        <div>
+          <h1>Pixel Art AI Studio</h1>
+          <p class="subtitle">Nền tảng tạo và chuẩn hóa tài nguyên Pixel Art cho Indie Games</p>
+        </div>
+      </div>
+      <div class="system-status">
+        <span id="backend-status-dot" class="status-dot dot-checking"></span>
+        <span id="backend-status-text">Đang kiểm tra Backend...</span>
+      </div>
+    </header>
+
+    <!-- Main Workspace Grid -->
+    <main class="studio-grid">
+      <!-- Left Panel: Generator Controls -->
+      <section class="panel control-panel">
+        <div class="panel-header">
+          <h2>⚙️ Cấu hình sinh ảnh</h2>
+        </div>
+
+        <form id="generation-form" class="control-form" onsubmit="return false;">
+          <!-- 1. Prompt Input -->
+          <div class="form-group">
+            <label for="prompt-input">
+              <strong>1. Prompt (Mô tả tài nguyên)</strong>
+              <span class="required">*</span>
+            </label>
+            <textarea
+              id="prompt-input"
+              rows="4"
+              placeholder="Ví dụ: Hiệp sĩ pixel cầm thanh kiếm phát sáng, áo giáp sắt cổ điển..."
+              required
+            ></textarea>
+            <div class="quick-prompts">
+              <span>Gợi ý nhanh:</span>
+              <button type="button" class="btn-chip" data-prompt="Hiệp sĩ trung cổ cầm gươm và khiên sắt">Hiệp sĩ</button>
+              <button type="button" class="btn-chip" data-prompt="Khiên thánh hiệp sĩ chữ thập đỏ viền vàng">Khiên thánh</button>
+              <button type="button" class="btn-chip" data-prompt="Lâu đài trung cổ trên đỉnh núi đá mây phủ">Lâu đài</button>
+            </div>
+          </div>
+
+          <!-- 2. Art Profile Selector -->
+          <div class="form-group">
+            <label for="profile-select">
+              <strong>2. Art Profile (Phong cách đồ họa)</strong>
+            </label>
+            <select id="profile-select">
+              <option value="medieval-pixel-art" selected>Đang tải danh sách profile...</option>
+            </select>
+            <p id="profile-desc" class="field-hint">Cấu hình mặc định: Medieval Pixel Art</p>
+          </div>
+
+          <!-- 3. Canvas Size Selector -->
+          <div class="form-group">
+            <label>
+              <strong>3. Canvas Size (Kích thước Pixel)</strong>
+            </label>
+            <div class="size-options">
+              <label class="size-radio-label">
+                <input type="radio" name="canvas-size" value="64" checked>
+                <span class="radio-card">
+                  <span class="size-text">64 × 64</span>
+                  <span class="size-desc">Item / Icon</span>
+                </span>
+              </label>
+              <label class="size-radio-label">
+                <input type="radio" name="canvas-size" value="128">
+                <span class="radio-card">
+                  <span class="size-text">128 × 128</span>
+                  <span class="size-desc">Character</span>
+                </span>
+              </label>
+              <label class="size-radio-label">
+                <input type="radio" name="canvas-size" value="256">
+                <span class="radio-card">
+                  <span class="size-text">256 × 256</span>
+                  <span class="size-desc">Scene / Boss</span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 4. Generate Button -->
+          <div class="form-actions">
+            <button type="button" id="generate-btn" class="btn-primary">
+              <span class="btn-icon">✨</span>
+              <span class="btn-text">Tạo Pixel Art (Mock)</span>
+            </button>
+          </div>
+        </form>
+
+        <div class="task-notice">
+          <small>ℹ️ <strong>TASK-001:</strong> Chế độ Mock Generator giả lập dữ liệu trước khi tích hợp mô hình AI thực tế ở TASK-002.</small>
+        </div>
+      </section>
+
+      <!-- Right Panel: Image Preview & Results -->
+      <section class="panel preview-panel">
+        <div class="panel-header">
+          <h2>🖼️ Kết quả xem trước</h2>
+          <span id="generator-badge" class="badge badge-mock">Mock Generator</span>
+        </div>
+
+        <!-- Status Message Banner -->
+        <div id="status-banner" class="status-banner status-idle">
+          <span id="status-icon">💤</span>
+          <span id="status-message">Sẵn sàng nhận lệnh tạo tài nguyên...</span>
+        </div>
+
+        <!-- Pixel Preview Viewport -->
+        <div class="preview-viewport">
+          <div class="checkerboard-canvas">
+            <img
+              id="preview-image"
+              src="/static/samples/sample_64.png"
+              alt="Pixel Art Preview"
+              class="pixelated-image"
+            />
+          </div>
+          <div class="viewport-info-bar">
+            <span id="info-size-tag">Kích thước: 64 × 64 px</span>
+            <span id="info-palette-tag">Palette: pico-8-medieval</span>
+          </div>
+        </div>
+
+        <!-- Metadata Details Card -->
+        <div class="metadata-card">
+          <h3>Thông số kỹ thuật</h3>
+          <div class="metadata-grid">
+            <div class="meta-item">
+              <span class="meta-label">Mã kết quả (ID):</span>
+              <span id="meta-id" class="meta-val">Chưa tạo</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Thời gian xử lý:</span>
+              <span id="meta-time" class="meta-val">-- ms</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Kiểu Generator:</span>
+              <span id="meta-generator" class="meta-val">mock</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Thời điểm tạo:</span>
+              <span id="meta-created" class="meta-val">--</span>
+            </div>
+          </div>
+
+          <div class="action-row">
+            <a id="download-link" href="/static/samples/sample_64.png" download="pixel_art_sample.png" class="btn-secondary">
+              ⬇️ Tải file PNG
+            </a>
+            <a id="view-raw-link" href="/static/samples/sample_64.png" target="_blank" class="btn-secondary">
+              🔍 Mở ảnh gốc
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
